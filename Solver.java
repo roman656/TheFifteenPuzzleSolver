@@ -1,5 +1,5 @@
 /**
- * State.java
+ * Solver.java
  * Copyright (C) 2020 Roman S <romanstrah@mail.ru>
  * 
  * TheFifteenPuzzleSolver is free software: you can redistribute it and/or modify it
@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package States;
+package Solvers;
 
-public interface State {
-	public Iterable<State> getPossibleMoves();
-	public boolean isSolution();
-	public boolean isSolvable();
-	public int getHeuristic();
-	public int getDistance();
-	public State getParent();
+import States.State;
+
+public interface Solver {
+	Iterable<State> solve(State initialState);
 }

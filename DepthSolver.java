@@ -1,5 +1,5 @@
 /**
- * State.java
+ * DepthSolver.java
  * Copyright (C) 2020 Roman S <romanstrah@mail.ru>
  * 
  * TheFifteenPuzzleSolver is free software: you can redistribute it and/or modify it
@@ -16,13 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package States;
+package Solvers;
 
-public interface State {
-	public Iterable<State> getPossibleMoves();
-	public boolean isSolution();
-	public boolean isSolvable();
-	public int getHeuristic();
-	public int getDistance();
-	public State getParent();
+import States.State;
+import java.util.Stack;
+
+public class DepthSolver extends AbstractSolver {
+	private Stack<State> openStack;
+
+	public DepthSolver() {
+		super();
+
+		this.openStack = new Stack<State>();
+	}
+
+	@Override
+	public void add(State state) {
+		if (!this.getVisited().contains(state)) {
+			this.openStack.push(state);
+		}
+	}
+
+	@Override
+	public State get() {
+		return this.openStack.pop();
+	}
+
+	@Override
+	public boolean isVisitedAll() {
+		return this.openStack.empty();
+	}
 }

@@ -1,5 +1,5 @@
 /**
- * State.java
+ * BreadthSolver.java
  * Copyright (C) 2020 Roman S <romanstrah@mail.ru>
  * 
  * TheFifteenPuzzleSolver is free software: you can redistribute it and/or modify it
@@ -16,13 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package States;
+package Solvers;
 
-public interface State {
-	public Iterable<State> getPossibleMoves();
-	public boolean isSolution();
-	public boolean isSolvable();
-	public int getHeuristic();
-	public int getDistance();
-	public State getParent();
+import States.State;
+import java.util.Queue;
+import java.util.LinkedList;
+
+public class BreadthSolver extends AbstractSolver {
+	private Queue<State> openQueue;
+
+	public BreadthSolver() {
+		super();
+
+		this.openQueue = new LinkedList<State>();
+	}
+
+	@Override
+	public void add(State state) {
+		this.openQueue.add(state);
+	}
+
+	@Override
+	public State get() {
+		return this.openQueue.poll();
+	}
+
+	@Override
+	public boolean isVisitedAll() {
+		return this.openQueue.isEmpty();
+	}
 }

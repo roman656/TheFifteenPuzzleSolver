@@ -1,26 +1,27 @@
 /**
- * TheFifteenPuzzleSolver.java
+ * NineCellsState.java
  * Copyright (C) 2020 Roman S <romanstrah@mail.ru>
- *
+ * 
  * TheFifteenPuzzleSolver is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * TheFifteenPuzzleSolver is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Solvers;
+package States;
 
 import static java.lang.Math.sqrt;
 import static java.lang.Math.round;
 import java.util.Random;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 /** Класс состояния пятнашек с размерностью поля 3 на 3. */
@@ -37,9 +38,9 @@ public class NineCellsState extends AbstractState {
 
 	/** Состояние игрового поля, при котором игра считается завершенной. */
 	private static final int[] GAME_FIELD_SOLUTION = {
-			0, 1, 2,
-			3, 4, 5,
-			6, 7, 8};
+			1, 2, 3,
+			4, 5, 6,
+			7, 8, 0};
 
 	/** Массив, хранящий текущее состояние игрового поля. */
 	private int[] gameField;
@@ -221,6 +222,23 @@ public class NineCellsState extends AbstractState {
 					+ "incorrect input array.\n");
 		}
 
+		/**
+		 * Проверка на то, что во входном массиве нет повторяющихся
+		 * и/или неверных элементов.
+		 */
+		int[] tempBuffer = new int[this.SIZE];
+
+		for (int i = 0; i < this.SIZE; i++) {
+			if ((newGameField[i] >= 0) && (newGameField[i] < this.SIZE)
+					&& (tempBuffer[newGameField[i]] == 0)) {
+				tempBuffer[newGameField[i]] += 1;
+			}
+			else {
+				throw new IllegalArgumentException("In setGameField(int[]): "
+						+ "incorrect input array values.\n");
+			}
+		}
+
 		/** Копирование входного массива. */
 		this.gameField = newGameField.clone();
 
@@ -386,7 +404,50 @@ public class NineCellsState extends AbstractState {
 	 */
 	@Override
 	public boolean isSolution() {
-		return this.gameField.equals(this.GAME_FIELD_SOLUTION);
+		return Arrays.equals(this.gameField, this.GAME_FIELD_SOLUTION);
+	}
+
+	/**
+	 * Метод проверяет, имеет ли текущее состояние игрового поля решение.
+	 * Данный алгоритм работает верно ТОЛЬКО для пятнашек 4 на 4.
+	 * Во всех остальных ситуациях будет возвращен true.
+	 * Возвращает:
+	 * @return true - имеет;
+	 *         false - не имеет.
+	 */
+	@Override
+	public boolean isSolvable() {
+
+		/**
+		 * Если текущее состояние уже является решением, возвращаем true.
+		 * На этом этапе производится проверка, применим ли данный алгоритм.
+		 */
+		if (this.isSolution() || (this.SIZE != 16)) {
+			return true;
+		}
+
+		/**
+		 * Количество пар элементов массива игрового поля,
+		 * в которых первый элемент с большим значением
+		 * (сравнение ведется относительно правильного порядка элементов)
+		 * предшествует элементу с меньшим.
+		 */
+		int sum = 0;
+
+		/** Номер строки, содержащей пустую ячейку (номер = индекс + 1). */
+		int emptyCellRowNumber = 
+				gameFieldIndexToCoordinates(this.emptyCellIndex)[0] + 1;
+
+		for (int i = 0; i < (this.SIZE - 1); i++) {
+			for (int j = i + 1; j < this.SIZE; j++) {
+				if ((this.gameField[i] > this.gameField[j])
+						&& (j != this.emptyCellIndex)) {
+					sum++;
+				}
+			}
+		}
+
+		return ((sum + emptyCellRowNumber) % 2 == 0);
 	}
 
 	/**
@@ -478,7 +539,7 @@ public class NineCellsState extends AbstractState {
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 
-		buffer.append("Game.NineCellsState:\n");
+		buffer.append("States.NineCellsState:\n");
 		buffer.append("Empty cell\'s id: " + this.emptyCellIndex + "\n");
 		buffer.append("Game field:\n");
 		buffer.append(gameFieldToString());
@@ -504,7 +565,7 @@ public class NineCellsState extends AbstractState {
 		}
 
 		NineCellsState temp = (NineCellsState) obj;
-		return (this.getGameField().equals(temp.getGameField()));
+		return Arrays.equals(this.gameField, temp.getGameField());
 	}
 
 	@Override
